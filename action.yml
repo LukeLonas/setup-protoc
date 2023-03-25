@@ -1,13 +1,16 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Setup Protoc'
+description: 'Setup protoc for action run'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  version:
+    description: 'version of protoc to setup'
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  token:
+    description: 'github access token'
+    required: true
+  prereleases:
+    description: 'should prerelease versions be included in search'
+    required: false
+    default: 'false'
 runs:
   using: 'node16'
   main: 'dist/index.js'

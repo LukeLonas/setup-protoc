@@ -1,21 +1,28 @@
-const core = require('@actions/core');
-const wait = require('./wait');
+const core = require("@actions/core");
+const tools = require("./tools");
 
-
-// most @actions toolkit packages have async methods
 async function run() {
-  try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    try {
+        const version = core.getInput("version");
+        const token = core.getInput("token");
+        const includePrerelease = core.getBooleanInput("prereleases");
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+        const latestRelease = await tools.findLatestRelease(
+            version,
+            token,
+            includePrerelease
+        );
 
-    core.setOutput('time', new Date().toTimeString());
-  } catch (error) {
-    core.setFailed(error.message);
-  }
+        const toolPath = await tools.downloadRelease(
+            latestRelease.location,
+            latestRelease.version
+        );
+
+        core.info(`Adding protoc ${latestRelease.version} to PATH`);
+        core.addPath(toolPath);
+    } catch (error) {
+        core.setFailed(error.message);
+    }
 }
 
 run();
