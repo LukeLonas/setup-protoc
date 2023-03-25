@@ -8,7 +8,7 @@ const tools = require("./tools");
 // });
 
 test('Print findLatestRelease output', async () => {
-  var target = await tools.findLatestRelease('22.x', "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");
+  var target = await tools.findLatestRelease('22.x', "GITHUB_ACCESS_TOKEN");
   console.log(target);
 }, 60000);
 
