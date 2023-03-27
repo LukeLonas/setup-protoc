@@ -16568,6 +16568,7 @@ const github = __nccwpck_require__(5438);
 const tc = __nccwpck_require__(7784);
 const os = __nccwpck_require__(2037);
 const path = __nccwpck_require__(1017);
+const fs = __nccwpck_require__(3292);
 
 async function findLatestRelease(
     targetVersion,
@@ -16668,7 +16669,13 @@ async function downloadRelease(location, version) {
     }
     // Attempt to download
     core.info(`Attempting to download protoc ${version} at ${location}`);
-    const downloadPath = await tc.downloadTool(location);
+    let downloadPath = await tc.downloadTool(location);
+    if (!downloadPath.endsWith(".zip")) {
+        core.debug("Renaming download to contain .zip extension");
+        const originalPath = downloadPath;
+        downloadPath = path.join(path.dirname(originalPath), path.basename(originalPath) + ".zip");
+        await fs.rename(originalPath, downloadPath);
+    }
     // Attempt to extract
     const extractionPath = await tc.extractZip(downloadPath);
     // Attempt to cache
@@ -16729,6 +16736,14 @@ module.exports = require("events");
 
 "use strict";
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ 3292:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs/promises");
 
 /***/ }),
 

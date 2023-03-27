@@ -4,6 +4,7 @@ const github = require("@actions/github");
 const tc = require("@actions/tool-cache");
 const os = require("os");
 const path = require("path");
+const fs = require("fs/promises");
 
 async function findLatestRelease(
     targetVersion,
@@ -104,7 +105,13 @@ async function downloadRelease(location, version) {
     }
     // Attempt to download
     core.info(`Attempting to download protoc ${version} at ${location}`);
-    const downloadPath = await tc.downloadTool(location);
+    let downloadPath = await tc.downloadTool(location);
+    if (!downloadPath.endsWith(".zip")) {
+        core.debug("Renaming download to contain .zip extension");
+        const originalPath = downloadPath;
+        downloadPath = path.join(path.dirname(originalPath), path.basename(originalPath) + ".zip");
+        await fs.rename(originalPath, downloadPath);
+    }
     // Attempt to extract
     const extractionPath = await tc.extractZip(downloadPath);
     // Attempt to cache
